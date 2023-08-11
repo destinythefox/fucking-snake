@@ -56,7 +56,7 @@ function update(time) {
         checkSelfCollision();
         checkFoodCollision();
 
-        moveTime = time + 150;
+        moveTime = time + 100;
     }
 }
 
