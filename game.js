@@ -18,9 +18,11 @@ let moveTime = 0;
 let direction = new Phaser.Geom.Point(16, 0);
 let score = 0;
 let scoreText;
-let debugText;
 let isGameOver = false;
 
+/**
+ * Initialization function. Sets up the game state, graphics, and input handlers.
+ */
 function create() {
     // Initialize snake with one segment
     snake = [this.add.rectangle(320, 240, 16, 16, 0x00ff00)];
@@ -28,14 +30,12 @@ function create() {
     // Place food at a random position
     food = this.add.rectangle(Phaser.Math.Between(0, 39) * 16, Phaser.Math.Between(0, 29) * 16, 16, 16, 0xff0000);
 
+    // Set up keyboard input
     cursors = this.input.keyboard.createCursorKeys();
 
-    // Initialize score and display it
+    // Display the initial score
     score = 0;
     scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '24px', fill: '#FFF' });
-
-    // Initialize debug text
-    debugText = this.add.text(16, 450, '', { fontSize: '16px', fill: '#FFF' });
 
     // Bind functions to the current context
     checkFoodCollision = checkFoodCollision.bind(this);
@@ -43,6 +43,10 @@ function create() {
     gameOver = gameOver.bind(this);
 }
 
+/**
+ * Main game loop. Handles game updates, such as movement and collision checks.
+ * @param {number} time - The current time. Used for frame updates.
+ */
 function update(time) {
     if (isGameOver) return;
 
@@ -56,7 +60,9 @@ function update(time) {
     }
 }
 
-
+/**
+ * Handles player input to set the snake's direction.
+ */
 function handleInput() {
     if (cursors.left.isDown && direction.x === 0) {
         direction.setTo(-16, 0);
@@ -69,6 +75,9 @@ function handleInput() {
     }
 }
 
+/**
+ * Moves the snake in the current direction.
+ */
 function moveSnake() {
     for (let i = snake.length - 1; i > 0; i--) {
         snake[i].setPosition(snake[i - 1].x, snake[i - 1].y);
@@ -77,6 +86,10 @@ function moveSnake() {
     snake[0].y = Phaser.Math.Wrap(snake[0].y + direction.y, 0, game.config.height);
 }
 
+/**
+ * Checks if the snake has collided with the food.
+ * If so, it increases the score and adds a new segment to the snake.
+ */
 function checkFoodCollision() {
     const headPosition = snake[0].getBounds();
     let tipX = snake[0].x + direction.x / 2;
@@ -92,6 +105,10 @@ function checkFoodCollision() {
     }
 }
 
+/**
+ * Checks if the snake has collided with itself.
+ * If so, it triggers the game over state.
+ */
 function checkSelfCollision() {
     const headPosition = snake[0].getBounds();
     let tipX = snake[0].x + direction.x / 2;
@@ -107,6 +124,9 @@ function checkSelfCollision() {
     }
 }
 
+/**
+ * Sets the game to the game over state and displays game over text.
+ */
 function gameOver() {
     isGameOver = true;
     this.add.text(320, 240, 'Game Over', { fontSize: '48px', fill: '#FF0000' }).setOrigin(0.5);
