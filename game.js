@@ -1,3 +1,5 @@
+import DebugSystem from './DebugSystem.js';
+
 const config = {
     type: Phaser.AUTO,
     width: 640,
@@ -23,11 +25,29 @@ let scoreText;
 let isGameOver = false;
 
 function create() {
+    this.debugSystem = new DebugSystem(this); // Instantiate DebugSystem first
+
     snake = [this.add.rectangle(320, 240, 16, 16, 0x00ff00)];
     food = this.add.rectangle(Phaser.Math.Between(0, 39) * 16, Phaser.Math.Between(0, 29) * 16, 16, 16, 0xff0000);
     cursors = this.input.keyboard.createCursorKeys();
     score = 0;
     scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '24px', fill: '#FFF' });
+
+    this.input.keyboard.on('keydown-P', () => {
+        if (this.debugSystem.debugMode) {
+            this.debugSystem.pauseGame();
+        }
+    });
+
+    this.input.keyboard.on('keydown-NUMPAD_ONE', () => {
+        if (this.debugSystem.debugMode) {
+            this.debugSystem.testMode();
+        }
+    });
+
+    this.input.keyboard.on('keydown-D', () => {
+        this.debugSystem.toggleDebugMode();
+    });
 
     // Bind functions to the current context
     checkFoodCollision = checkFoodCollision.bind(this);
@@ -37,9 +57,13 @@ function create() {
 }
 
 function update(time) {
-    if (isGameOver) return;
-    console.log("Update function running");
+    if (this.debugSystem.debugMode) {
+        this.debugSystem.logFunctionCall('update');
+        this.debugSystem.displayInfo();
+        this.debugSystem.displayVariables();
+    }
 
+    if (isGameOver) return;
 
     if (time >= moveTime) {
         handleInput();
@@ -50,6 +74,7 @@ function update(time) {
         moveTime = time + 100; // Updated move speed
     }
 }
+
 
 function handleInput() {
     if (cursors.left.isDown && direction.x === 0) {
