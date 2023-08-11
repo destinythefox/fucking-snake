@@ -38,6 +38,8 @@ function create() {
 
 function update(time) {
     if (isGameOver) return;
+    console.log("Update function running");
+
 
     if (time >= moveTime) {
         handleInput();
@@ -120,6 +122,16 @@ function gameOver() {
     isGameOver = true;
     this.add.text(320, 240, 'Game Over', { fontSize: '48px', fill: '#FF0000' }).setOrigin(0.5);
     this.add.text(320, 290, 'Click to Restart', { fontSize: '24px', fill: '#FF0000' }).setOrigin(0.5).setInteractive().on('pointerdown', () => {
+        // Kill all tweens
+        this.tweens.killAll();
+
+        // Reset global variables
+        moveTime = 0;
+        direction = new Phaser.Geom.Point(16, 0);
+        score = 0;
+        isGameOver = false;
+
+        // Restart the scene
         this.scene.restart();
     });
 }
