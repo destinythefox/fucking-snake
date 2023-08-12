@@ -25,8 +25,6 @@ let isGameOver = false;
 
 function create() {
     this.snake = [this.add.rectangle(320, 240, 16, 16, 0x00ff00).setOrigin(0,0)];
-    this.debugSystem = new DebugSystem(this, config.width, config.height);
-    this.debugSystem.logFunctionCall('create');
     this.direction = new Phaser.Geom.Point(16, 0);
     food = this.add.rectangle(Phaser.Math.Between(0, 39) * 16, Phaser.Math.Between(0, 29) * 16, 16, 16, 0xff0000).setOrigin(0,0);
     cursors = this.input.keyboard.createCursorKeys();
@@ -97,6 +95,8 @@ function create() {
     this.debugSystem.toggleDebugMode();
 });
 
+    this.debugSystem = new DebugSystem(this, config.width, config.height);
+    this.debugSystem.logFunctionCall('create');
 
 }
 
@@ -107,6 +107,9 @@ function update(time) {
         this.debugSystem.logFunctionCall('update');
         this.debugSystem.displayInfo();
         this.debugSystem.displayVariables();
+        //Debug
+        console.log("Food:", food);
+        console.log("Snake:", this.scene.snake);
     }
 }
 
@@ -137,8 +140,8 @@ function expandSnake() {
 
 function checkFoodCollision() {
     const headPosition = this.snake[0].getBounds();
-    let tipX = this.snake[0].x + this.direction.x / 2;
-    let tipY = this.snake[0].y + this.direction.y / 2;
+    let tipX = this.snake[0].x + this.direction.x;
+    let tipY = this.snake[0].y + this.direction.y;
 
     const foodBounds = food.getBounds();
     if (foodBounds.contains(tipX, tipY)) {
@@ -151,13 +154,13 @@ function checkFoodCollision() {
 
 function checkSelfCollision() {
     const headPosition = this.snake[0].getBounds();
-    let tipX = this.snake[0].x + this.direction.x / 2;
-    let tipY = this.snake[0].y + this.direction.y / 2;
+    let tipX = this.snake[0].x + this.direction.x;
+    let tipY = this.snake[0].y + this.direction.y;
 
     for (let i = 1; i < this.snake.length; i++) {
-        const segmentBounds = this.snake[i].getBounds();
+    const segmentBounds = this.snake[i].getBounds();
 
-        if (segmentBounds.contains(tipX, tipY)) {
+    if (segmentBounds.contains(tipX, tipY)) {
             if (this.debugSystem.debugMode) {
                 this.debugSystem.visualizeSelfCollision(i, this.snake[i]);
             } else {
