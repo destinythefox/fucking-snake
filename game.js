@@ -1,4 +1,5 @@
 import DebugSystem from './DebugSystem.js';
+import StateMachine from './StateMachine.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -23,29 +24,64 @@ let scoreText;
 let isGameOver = false;
 
 function create() {
-    this.snake = [this.add.rectangle(320, 240, 16, 16, 0x00ff00)];
-    this.debugSystem = new DebugSystem(this);
+    this.snake = [this.add.rectangle(320, 240, 16, 16, 0x00ff00).setOrigin(0,0)];
+    this.debugSystem = new DebugSystem(this, config.width, config.height);
     this.debugSystem.logFunctionCall('create');
     this.direction = new Phaser.Geom.Point(16, 0);
-    food = this.add.rectangle(Phaser.Math.Between(0, 39) * 16, Phaser.Math.Between(0, 29) * 16, 16, 16, 0xff0000);
+    food = this.add.rectangle(Phaser.Math.Between(0, 39) * 16, Phaser.Math.Between(0, 29) * 16, 16, 16, 0xff0000).setOrigin(0,0);
     cursors = this.input.keyboard.createCursorKeys();
     score = 0;
     scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '24px', fill: '#FFF' });
 
+    // Initialize the state machine
+    this.gameStates = new StateMachine(this);
+
+    // Define the play state
+    this.gameStates.add('play', {
+        enter: function() {
+            console.log('Entered play state');
+        },
+        update: function(time) {
+            if (isGameOver) return;
+
+            if (time >= moveTime) {
+
+                handleInput.call(this);
+                moveSnake.call(this);
+                checkSelfCollision.call(this);
+                checkFoodCollision.call(this);
+
+                moveTime = time + 100; // Updated move speed
+            }
+        },
+        exit: function() {
+            console.log('Exited play state');
+        }
+    });
+
+    // Define the pause state
+    this.gameStates.add('pause', {
+        enter: function() {
+            console.log('Entered pause state');
+            this.pausedText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 'Game Paused', { fontSize: '32px', fill: '#FFF' }).setOrigin(0.5);
+        },
+        exit: function() {
+            console.log('Exited pause state');
+            if (this.pausedText) {
+                this.pausedText.destroy();
+            }
+        }
+    });
+
+    // Start the game in the play state
+    this.gameStates.change('play');
+
     this.input.keyboard.on('keydown-P', () => {
-        if (this.debugSystem.debugMode) {
-            this.debugSystem.pauseGame();
+        if (this.gameStates.currentState === 'play') {
+            this.gameStates.change('pause');
+        } else if (this.gameStates.currentState === 'pause') {
+            this.gameStates.change('play');
         }
-    });
-
-    this.input.keyboard.on('keydown-NUMPAD_ONE', () => {
-        if (this.debugSystem.debugMode) {
-            this.debugSystem.testMode();
-        }
-    });
-
-    this.input.keyboard.on('keydown-D', () => {
-        this.debugSystem.toggleDebugMode();
     });
 
     // Bind functions to the current context
@@ -55,24 +91,22 @@ function create() {
     gameOver = gameOver.bind(this);
     handleInput = handleInput.bind(this);
     moveSnake = moveSnake.bind(this);
+    expandSnake = expandSnake.bind(this);
+
+    this.input.keyboard.on('keydown-D', () => {
+    this.debugSystem.toggleDebugMode();
+});
+
+
 }
 
 function update(time) {
+    this.gameStates.update(time);
+
     if (this.debugSystem.debugMode) {
         this.debugSystem.logFunctionCall('update');
         this.debugSystem.displayInfo();
         this.debugSystem.displayVariables();
-    }
-
-    if (isGameOver) return;
-
-    if (time >= moveTime) {
-        handleInput();
-        moveSnake();
-        checkSelfCollision();
-        checkFoodCollision();
-
-        moveTime = time + 100; // Updated move speed
     }
 }
 
@@ -96,6 +130,11 @@ function moveSnake() {
     this.snake[0].y = Phaser.Math.Wrap(this.snake[0].y + this.direction.y, 0, game.config.height);
 }
 
+function expandSnake() {
+    const tail = this.snake[this.snake.length - 1];
+    this.snake.push(this.add.rectangle(tail.x, tail.y, 16, 16, 0x00ff00).setOrigin(0,0));
+}
+
 function checkFoodCollision() {
     const headPosition = this.snake[0].getBounds();
     let tipX = this.snake[0].x + this.direction.x / 2;
@@ -103,8 +142,7 @@ function checkFoodCollision() {
 
     const foodBounds = food.getBounds();
     if (foodBounds.contains(tipX, tipY)) {
-        const tail = this.snake[this.snake.length - 1];
-        this.snake.push(this.add.rectangle(tail.x, tail.y, 16, 16, 0x00ff00));
+        expandSnake();
         food.setPosition(Phaser.Math.Between(0, 39) * 16, Phaser.Math.Between(0, 29) * 16);
         score += 10;
         scoreText.setText('Score: ' + score);
