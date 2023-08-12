@@ -107,11 +107,16 @@ function update(time) {
 
     if (this.debugSystem.debugMode) {
         this.debugSystem.logFunctionCall('update');
-        this.debugSystem.displayInfo();
-        this.debugSystem.displayVariables();
+        this.debugSystem.display();
+
+        //this.debugSystem.displayInfo();
+        //this.debugSystem.displayVariables();
         //Debug
         console.log("Food:", this.food);
         console.log("Snake:", this.snake);
+    }
+    else{
+        this.debugSystem.clearDebugTexts();
     }
 }
 
@@ -141,9 +146,9 @@ function expandSnake() {
 }
 
 function checkFoodCollision() {
-    const headPosition = this.snake[0].getBounds();
-    let tipX = this.snake[0].x + this.direction.x;
-    let tipY = this.snake[0].y + this.direction.y;
+    const headCenter = this.snake[0].getCenter();
+    let tipX = headCenter.x + this.direction.x;
+    let tipY = headCenter.y + this.direction.y;
 
     const foodBounds = this.food.getBounds();
     if (foodBounds.contains(tipX, tipY)) {
@@ -155,9 +160,9 @@ function checkFoodCollision() {
 }
 
 function checkSelfCollision() {
-    const headPosition = this.snake[0].getBounds();
-    let tipX = this.snake[0].x + this.direction.x;
-    let tipY = this.snake[0].y + this.direction.y;
+    const headCenter = this.snake[0].getCenter();
+    let tipX = headCenter.x + this.direction.x;
+    let tipY = headCenter.y + this.direction.y;
 
     for (let i = 1; i < this.snake.length; i++) {
     const segmentBounds = this.snake[i].getBounds();

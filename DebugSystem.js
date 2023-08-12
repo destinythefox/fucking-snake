@@ -11,8 +11,18 @@ export default class DebugSystem {
         this.debugMode = !this.debugMode;
     }
 
+    
+    display(){
+        this.clearDebugTexts();
+
+        this.displayVariables();
+        this.displayInfo();
+    }
+
+
    displayInfo() {
     console.log('Displaying debug information...');
+
 
     const fps = Math.round(1000 / this.scene.game.loop.delta);
     const memory = (performance && performance.memory && performance.memory.usedJSHeapSize) 
@@ -20,7 +30,7 @@ export default class DebugSystem {
         : 'N/A';
     const snakeLength = this.scene.snake.length;
 
-    this.clearDebugTexts();
+    //this.clearDebugTexts();
 
     // Display FPS at the bottom right
     this.debugTexts.push(this.scene.add.text(this.gameWidth - 100, this.gameHeight - 70, `FPS: ${fps}`, { fontSize: '12px', fill: '#FFF' }).setOrigin(1, 1));
@@ -33,8 +43,9 @@ export default class DebugSystem {
 
     if (this.debugMode) {
         // Visualization
-        this.visualizeTipOfSnake();
         this.visualizeBounds(this.scene.food);
+        this.visualizeTipOfSnake();
+
         if (this.scene.snake && this.scene.snake.length > 0) {
             this.scene.snake.forEach(segment => {
                 this.visualizeBounds(segment);
@@ -56,7 +67,7 @@ export default class DebugSystem {
     }
 
     displayVariables() {
-        this.clearDebugTexts();
+        //this.clearDebugTexts();
 
         if (this.scene) {
             this.debugTexts.push(this.scene.add.text(10, 55, `Score: ${this.scene.score}`, { fontSize: '12px', fill: '#FFF' }));
@@ -106,10 +117,19 @@ export default class DebugSystem {
     }
 
     visualizeTipOfSnake() {
-        const tipX = this.scene.snake[0].x + this.scene.direction.x;
-        const tipY = this.scene.snake[0].y + this.scene.direction.y;
-        const circle = this.scene.add.circle(tipX, tipY, 4, 0xff0000);
-        this.debugTexts.push(circle);
+        const headCenter = this.scene.snake[0].getCenter();
+        let tipX = headCenter.x + this.scene.direction.x / 2;
+        let tipY = headCenter.y + this.scene.direction.y / 2;
+
+        let rect = this.scene.add.rectangle(tipX, tipY, 3, 3, 0xffff00, 0).setStrokeStyle(1, 0xffff00);
+
+        //const tipX = this.scene.snake[0].x + this.scene.direction.x;
+        //const tipY = this.scene.snake[0].y + this.scene.direction.y;
+        //console.log("TipX: " + tipX + "| TipY: " + tipY);
+        //console.log(rect);
+
+        //const circle = this.scene.add.rectangle(tipX, tipY, 8, 8, 0xff0000);
+        this.debugTexts.push(rect);
     }
 
  visualizeBounds(gameObject) {
@@ -117,8 +137,10 @@ export default class DebugSystem {
         console.warn("GameObject is undefined in visualizeBounds");
         return;
     }
+
     const bounds = gameObject.getBounds();
-    const rect = this.scene.add.rectangle(bounds.x, bounds.y, bounds.width, bounds.height, 0xffff00, 0).setStrokeStyle(1, 0xffff00);
+    const rect = this.scene.add.rectangle(bounds.x, bounds.y, bounds.width, bounds.height, 0xffff00, 0).setOrigin(0,0).setStrokeStyle(1, 0xffff00);
+
     this.debugTexts.push(rect);
     }
 
