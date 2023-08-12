@@ -16,22 +16,22 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-let food;
+//let food;
 let cursors;
-let moveTime = 0;
-let score = 0;
 let scoreText;
 let isGameOver = false;
 
 function create() {
     this.snake = [this.add.rectangle(320, 240, 16, 16, 0x00ff00).setOrigin(0,0)];
-    this.debugSystem = new DebugSystem(this, config.width, config.height);
-    this.debugSystem.logFunctionCall('create');
     this.direction = new Phaser.Geom.Point(16, 0);
-    food = this.add.rectangle(Phaser.Math.Between(0, 39) * 16, Phaser.Math.Between(0, 29) * 16, 16, 16, 0xff0000).setOrigin(0,0);
+    this.food = this.add.rectangle(Phaser.Math.Between(0, 39) * 16, Phaser.Math.Between(0, 29) * 16, 16, 16, 0xff0000).setOrigin(0,0);
     cursors = this.input.keyboard.createCursorKeys();
-    score = 0;
+    this.score = 0;
     scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '24px', fill: '#FFF' });
+
+    // Reset global variables
+    this.moveTime = 0;
+    isGameOver = false;
 
     // Initialize the state machine
     this.gameStates = new StateMachine(this);
@@ -44,14 +44,14 @@ function create() {
         update: function(time) {
             if (isGameOver) return;
 
-            if (time >= moveTime) {
+            if (time >= this.moveTime) {
 
                 handleInput.call(this);
                 moveSnake.call(this);
                 checkSelfCollision.call(this);
                 checkFoodCollision.call(this);
 
-                moveTime = time + 100; // Updated move speed
+                this.moveTime = time + 100; // Updated move speed
             }
         },
         exit: function() {
@@ -97,6 +97,8 @@ function create() {
     this.debugSystem.toggleDebugMode();
 });
 
+    this.debugSystem = new DebugSystem(this, config.width, config.height);
+    this.debugSystem.logFunctionCall('create');
 
 }
 
@@ -105,8 +107,16 @@ function update(time) {
 
     if (this.debugSystem.debugMode) {
         this.debugSystem.logFunctionCall('update');
-        this.debugSystem.displayInfo();
-        this.debugSystem.displayVariables();
+        this.debugSystem.display();
+
+        //this.debugSystem.displayInfo();
+        //this.debugSystem.displayVariables();
+        //Debug
+        console.log("Food:", this.food);
+        console.log("Snake:", this.snake);
+    }
+    else{
+        this.debugSystem.clearDebugTexts();
     }
 }
 
@@ -136,28 +146,28 @@ function expandSnake() {
 }
 
 function checkFoodCollision() {
-    const headPosition = this.snake[0].getBounds();
-    let tipX = this.snake[0].x + this.direction.x / 2;
-    let tipY = this.snake[0].y + this.direction.y / 2;
+    const headCenter = this.snake[0].getCenter();
+    let tipX = headCenter.x + this.direction.x;
+    let tipY = headCenter.y + this.direction.y;
 
-    const foodBounds = food.getBounds();
+    const foodBounds = this.food.getBounds();
     if (foodBounds.contains(tipX, tipY)) {
         expandSnake();
-        food.setPosition(Phaser.Math.Between(0, 39) * 16, Phaser.Math.Between(0, 29) * 16);
-        score += 10;
-        scoreText.setText('Score: ' + score);
+        this.food.setPosition(Phaser.Math.Between(0, 39) * 16, Phaser.Math.Between(0, 29) * 16);
+        this.score += 10;
+        scoreText.setText('Score: ' + this.score);
     }
 }
 
 function checkSelfCollision() {
-    const headPosition = this.snake[0].getBounds();
-    let tipX = this.snake[0].x + this.direction.x / 2;
-    let tipY = this.snake[0].y + this.direction.y / 2;
+    const headCenter = this.snake[0].getCenter();
+    let tipX = headCenter.x + this.direction.x;
+    let tipY = headCenter.y + this.direction.y;
 
     for (let i = 1; i < this.snake.length; i++) {
-        const segmentBounds = this.snake[i].getBounds();
+    const segmentBounds = this.snake[i].getBounds();
 
-        if (segmentBounds.contains(tipX, tipY)) {
+    if (segmentBounds.contains(tipX, tipY)) {
             if (this.debugSystem.debugMode) {
                 this.debugSystem.visualizeSelfCollision(i, this.snake[i]);
             } else {
@@ -191,11 +201,6 @@ function gameOver() {
     this.add.text(320, 290, 'Click to Restart', { fontSize: '24px', fill: '#FF0000' }).setOrigin(0.5).setInteractive().on('pointerdown', () => {
         // Kill all tweens
         this.tweens.killAll();
-
-        // Reset global variables
-        moveTime = 0;
-        score = 0;
-        isGameOver = false;
 
         // Restart the scene
         this.scene.restart();
