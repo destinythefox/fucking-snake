@@ -1,4 +1,5 @@
 import DebugSystem from './DebugSystem.js';
+import StateMachine from './StateMachine.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -32,20 +33,54 @@ function create() {
     score = 0;
     scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '24px', fill: '#FFF' });
 
+    // Initialize the state machine
+    this.gameStates = new StateMachine(this);
+
+    // Define the play state
+    this.gameStates.add('play', {
+        enter: function() {
+            console.log('Entered play state');
+        },
+        update: function(time) {
+            if (isGameOver) return;
+
+            if (time >= moveTime) {
+                handleInput.call(this);
+                moveSnake.call(this);
+                checkSelfCollision.call(this);
+                checkFoodCollision.call(this);
+
+                moveTime = time + 100; // Updated move speed
+            }
+        },
+        exit: function() {
+            console.log('Exited play state');
+        }
+    });
+
+    // Define the pause state
+    this.gameStates.add('pause', {
+        enter: function() {
+            console.log('Entered pause state');
+            this.pausedText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 'Game Paused', { fontSize: '32px', fill: '#FFF' }).setOrigin(0.5);
+        },
+        exit: function() {
+            console.log('Exited pause state');
+            if (this.pausedText) {
+                this.pausedText.destroy();
+            }
+        }
+    });
+
+    // Start the game in the play state
+    this.gameStates.change('play');
+
     this.input.keyboard.on('keydown-P', () => {
-        if (this.debugSystem.debugMode) {
-            this.debugSystem.pauseGame();
+        if (this.gameStates.currentState === 'play') {
+            this.gameStates.change('pause');
+        } else if (this.gameStates.currentState === 'pause') {
+            this.gameStates.change('play');
         }
-    });
-
-    this.input.keyboard.on('keydown-NUMPAD_ONE', () => {
-        if (this.debugSystem.debugMode) {
-            this.debugSystem.testMode();
-        }
-    });
-
-    this.input.keyboard.on('keydown-D', () => {
-        this.debugSystem.toggleDebugMode();
     });
 
     // Bind functions to the current context
@@ -55,24 +90,23 @@ function create() {
     gameOver = gameOver.bind(this);
     handleInput = handleInput.bind(this);
     moveSnake = moveSnake.bind(this);
+
+    this.input.keyboard.on('keydown-D', () => {
+    this.debugSystem.toggleDebugMode();
+});
+
+
 }
 
 function update(time) {
+    // Update the state machine, which will call the update method of the current state
+    this.gameStates.update(time);
+
+    // The debug system can remain outside the state machine if you want it to be accessible in all states
     if (this.debugSystem.debugMode) {
         this.debugSystem.logFunctionCall('update');
         this.debugSystem.displayInfo();
         this.debugSystem.displayVariables();
-    }
-
-    if (isGameOver) return;
-
-    if (time >= moveTime) {
-        handleInput();
-        moveSnake();
-        checkSelfCollision();
-        checkFoodCollision();
-
-        moveTime = time + 100; // Updated move speed
     }
 }
 
