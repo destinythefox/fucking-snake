@@ -3,59 +3,63 @@ export default class DebugSystem {
         this.scene = scene; // Reference to the game scene
         this.debugMode = false; // Track if debug mode is active
         this.debugTexts = []; // Store references to all debug text objects
-        // ... any other properties needed
     }
 
-    // Toggle the debug mode on and off
     toggleDebugMode() {
         this.debugMode = !this.debugMode;
-        // ... any other toggle-related logic
     }
 
-    // Display real-time metrics and game variables
-     displayInfo() {
-        // Calculate FPS
+    displayInfo() {
         const fps = Math.round(1000 / this.scene.game.loop.delta);
-
-        // Get memory usage (might not be supported in all browsers)
         const memory = (performance && performance.memory && performance.memory.usedJSHeapSize) 
             ? (performance.memory.usedJSHeapSize / 1048576).toFixed(2) + ' MB' 
             : 'N/A';
-
-        // Get snake segment count
         const snakeLength = this.scene.snake.length;
 
-        // Display the information
-        this.clearDebugTexts(); // Clear previous debug texts
+        this.clearDebugTexts();
         this.debugTexts.push(this.scene.add.text(10, 10, `FPS: ${fps}`, { fontSize: '12px', fill: '#FFF' }));
         this.debugTexts.push(this.scene.add.text(10, 25, `Memory: ${memory}`, { fontSize: '12px', fill: '#FFF' }));
         this.debugTexts.push(this.scene.add.text(10, 40, `Snake Segments: ${snakeLength}`, { fontSize: '12px', fill: '#FFF' }));
     }
 
     clearDebugTexts() {
-        // Destroy each debug text object and clear the array
         this.debugTexts.forEach(text => text.destroy());
         this.debugTexts = [];
     }
 
+    displayVariables() {
+        this.clearDebugTexts();
 
-    // Visualize collisions
-    visualizeCollisions() {
-        // ... logic to change color of colliding objects
+        if (this.scene) {
+            this.debugTexts.push(this.scene.add.text(10, 55, `Score: ${this.scene.score}`, { fontSize: '12px', fill: '#FFF' }));
+            if (this.scene.direction) {
+                this.debugTexts.push(this.scene.add.text(10, 70, `Direction: (${this.scene.direction.x}, ${this.scene.direction.y})`, { fontSize: '12px', fill: '#FFF' }));
+            }
+            this.debugTexts.push(this.scene.add.text(10, 85, `Snake Length: ${this.scene.snake.length}`, { fontSize: '12px', fill: '#FFF' }));
+            this.debugTexts.push(this.scene.add.text(10, 100, `Game State: ${this.scene.isGameOver ? "Game Over" : "Running"}`, { fontSize: '12px', fill: '#FFF' }));
+            this.debugTexts.push(this.scene.add.text(10, 115, `Move Time: ${this.scene.moveTime}`, { fontSize: '12px', fill: '#FFF' }));
+            if (this.scene.food) {
+                this.debugTexts.push(this.scene.add.text(10, 130, `Food Position: (${this.scene.food.x}, ${this.scene.food.y})`, { fontSize: '12px', fill: '#FFF' }));
+            }
+        }
     }
 
-    // Log function calls
+    visualizeSelfCollision(segmentIndex, segment) {
+        segment.fillColor = 0x0000ff;
+        this.displayCollisionSegment(segmentIndex);
+    }
+
+    displayCollisionSegment(segmentIndex) {
+        const text = `Collided with segment: ${segmentIndex}`;
+        const collisionText = this.scene.add.text(this.scene.cameras.main.centerX, this.scene.cameras.main.height - 20, text, { fontSize: '16px', fill: '#FFF' }).setOrigin(0.5);
+        this.debugTexts.push(collisionText);
+    }
+
     logFunctionCall(funcName) {
         console.log(`Function ${funcName} called.`);
     }
 
-     pauseGame() {
-        if (this.scene.scene.isPaused()) {
-            this.scene.scene.resume();
-        } else {
-            this.scene.scene.pause();
-        }
-    
+    pauseGame() {
         if (this.scene.scene.isPaused()) {
             this.scene.scene.resume();
             if (this.pausedText) {
@@ -67,15 +71,7 @@ export default class DebugSystem {
         }
     }
 
-    // Test modes (like growing the snake)
     testMode() {
         // ... logic for test behaviors
     }
-
-    // Display all game variables
-    displayVariables() {
-        // ... logic to gather and display game variables
-    }
-
-    // ... any other methods needed
 }
