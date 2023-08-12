@@ -26,7 +26,7 @@ class StateMachine {
     // Update the current state
     update(time) {
         if (this.currentState && this.states[this.currentState].update) {
-            this.states[this.currentState].update.call(this.context);
+            this.states[this.currentState].update.call(this.context, time);
         }
     }
 }

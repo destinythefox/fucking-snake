@@ -24,11 +24,11 @@ let scoreText;
 let isGameOver = false;
 
 function create() {
-    this.snake = [this.add.rectangle(320, 240, 16, 16, 0x00ff00)];
-    this.debugSystem = new DebugSystem(this);
+    this.snake = [this.add.rectangle(320, 240, 16, 16, 0x00ff00).setOrigin(0,0)];
+    this.debugSystem = new DebugSystem(this, config.width, config.height);
     this.debugSystem.logFunctionCall('create');
     this.direction = new Phaser.Geom.Point(16, 0);
-    food = this.add.rectangle(Phaser.Math.Between(0, 39) * 16, Phaser.Math.Between(0, 29) * 16, 16, 16, 0xff0000);
+    food = this.add.rectangle(Phaser.Math.Between(0, 39) * 16, Phaser.Math.Between(0, 29) * 16, 16, 16, 0xff0000).setOrigin(0,0);
     cursors = this.input.keyboard.createCursorKeys();
     score = 0;
     scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '24px', fill: '#FFF' });
@@ -45,6 +45,7 @@ function create() {
             if (isGameOver) return;
 
             if (time >= moveTime) {
+
                 handleInput.call(this);
                 moveSnake.call(this);
                 checkSelfCollision.call(this);
@@ -90,6 +91,7 @@ function create() {
     gameOver = gameOver.bind(this);
     handleInput = handleInput.bind(this);
     moveSnake = moveSnake.bind(this);
+    expandSnake = expandSnake.bind(this);
 
     this.input.keyboard.on('keydown-D', () => {
     this.debugSystem.toggleDebugMode();
@@ -99,10 +101,8 @@ function create() {
 }
 
 function update(time) {
-    // Update the state machine, which will call the update method of the current state
     this.gameStates.update(time);
 
-    // The debug system can remain outside the state machine if you want it to be accessible in all states
     if (this.debugSystem.debugMode) {
         this.debugSystem.logFunctionCall('update');
         this.debugSystem.displayInfo();
@@ -130,6 +130,11 @@ function moveSnake() {
     this.snake[0].y = Phaser.Math.Wrap(this.snake[0].y + this.direction.y, 0, game.config.height);
 }
 
+function expandSnake() {
+    const tail = this.snake[this.snake.length - 1];
+    this.snake.push(this.add.rectangle(tail.x, tail.y, 16, 16, 0x00ff00).setOrigin(0,0));
+}
+
 function checkFoodCollision() {
     const headPosition = this.snake[0].getBounds();
     let tipX = this.snake[0].x + this.direction.x / 2;
@@ -137,8 +142,7 @@ function checkFoodCollision() {
 
     const foodBounds = food.getBounds();
     if (foodBounds.contains(tipX, tipY)) {
-        const tail = this.snake[this.snake.length - 1];
-        this.snake.push(this.add.rectangle(tail.x, tail.y, 16, 16, 0x00ff00));
+        expandSnake();
         food.setPosition(Phaser.Math.Between(0, 39) * 16, Phaser.Math.Between(0, 29) * 16);
         score += 10;
         scoreText.setText('Score: ' + score);

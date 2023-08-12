@@ -1,6 +1,8 @@
 export default class DebugSystem {
-    constructor(scene) {
-        this.scene = scene; // Reference to the game scene
+   constructor(scene, gameWidth, gameHeight) {
+        this.scene = scene; // Reference to this scene
+        this.gameWidth = gameWidth;
+        this.gameHeight = gameHeight;
         this.debugMode = false; // Track if debug mode is active
         this.debugTexts = []; // Store references to all debug text objects
     }
@@ -21,13 +23,13 @@ export default class DebugSystem {
     this.clearDebugTexts();
 
     // Display FPS at the bottom right
-    this.debugTexts.push(this.scene.add.text(gameWidth - 100, gameHeight - 70, `FPS: ${fps}`, { fontSize: '12px', fill: '#FFF' }).setOrigin(1, 1));
+    this.debugTexts.push(this.scene.add.text(this.gameWidth - 100, this.gameHeight - 70, `FPS: ${fps}`, { fontSize: '12px', fill: '#FFF' }).setOrigin(1, 1));
 
     // Display Memory usage just above FPS
-    this.debugTexts.push(this.scene.add.text(gameWidth - 100, gameHeight - 50, `Memory: ${memory}`, { fontSize: '12px', fill: '#FFF' }).setOrigin(1, 1));
+    this.debugTexts.push(this.scene.add.text(this.gameWidth - 100, this.gameHeight - 50, `Memory: ${memory}`, { fontSize: '12px', fill: '#FFF' }).setOrigin(1, 1));
 
     // Display Snake Segments just above Memory usage
-    this.debugTexts.push(this.scene.add.text(gameWidth - 100, gameHeight - 30, `Snake Segments: ${snakeLength}`, { fontSize: '12px', fill: '#FFF' }).setOrigin(1, 1));
+    this.debugTexts.push(this.scene.add.text(this.gameWidth - 100, this.gameHeight - 30, `Snake Segments: ${snakeLength}`, { fontSize: '12px', fill: '#FFF' }).setOrigin(1, 1));
     }
 
     clearDebugTexts() {
