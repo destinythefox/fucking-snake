@@ -1,7 +1,6 @@
 import DebugSystem from './DebugSystem.js';
 import StateMachine from './StateMachine.js';
 
-    parent: 'game-container',
 let cursors;
 let scoreText;
 let isGameOver = false;
@@ -74,6 +73,10 @@ class GameScene extends Phaser.Scene {
     preload() {}
 
     create() {
+        this.debugSystem = new DebugSystem(this, config.width, config.height);
+        this.debugSystem.logFunctionCall('create');
+
+
         this.snake = new Snake(this);
 
         //Define scene variables
@@ -86,7 +89,8 @@ class GameScene extends Phaser.Scene {
         cursors = this.input.keyboard.createCursorKeys();
         isGameOver = false;
         
-    
+
+
         // Initialize the state machine
         this.gameStates = new StateMachine(this);
     
@@ -140,8 +144,7 @@ class GameScene extends Phaser.Scene {
             }
         });
     
-        this.debugSystem = new DebugSystem(this, config.width, config.height);
-        this.debugSystem.logFunctionCall('create');
+
     }
 
     update(time){
