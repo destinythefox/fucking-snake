@@ -145,8 +145,6 @@ class GameScene extends Phaser.Scene {
     
         this.debugSystem = new DebugSystem(this, config.width, config.height);
         this.debugSystem.logFunctionCall('create');
-
-        this.snake.flash(this.gameOver);
     }
 
     update(time){
@@ -246,6 +244,7 @@ class GameScene extends Phaser.Scene {
 
 const config = {
     type: Phaser.AUTO,
+    parent: 'game-container',
     width: 640,
     height: 480,
     backgroundColor: "#1b1b1b",

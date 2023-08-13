@@ -1,0 +1,21 @@
+{
+    "app_name": "snake",
+    "main": "index.html",
+    "name": "snake",
+    "version": ".13",
+    "webkit": {},
+    "window": {
+        "exe_icon": "banner.png",
+        "frame": true,
+        "height": 480,
+        "icon": "Noot.png",
+        "id": "snake",
+        "mac_icon": "Noot.png",
+        "max_height": 480,
+        "max_width": 640,
+        "min_height": 480,
+        "min_width": 640,
+        "title": "snake",
+        "width": 640
+    }
+}
