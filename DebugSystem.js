@@ -28,7 +28,7 @@ export default class DebugSystem {
     const memory = (performance && performance.memory && performance.memory.usedJSHeapSize) 
         ? (performance.memory.usedJSHeapSize / 1048576).toFixed(2) + ' MB' 
         : 'N/A';
-    const snakeLength = this.scene.snake.length;
+    const snakeLength = this.scene.snake.body.length;
 
     //this.clearDebugTexts();
 
@@ -46,8 +46,8 @@ export default class DebugSystem {
         this.visualizeBounds(this.scene.food);
         this.visualizeTipOfSnake();
 
-        if (this.scene.snake && this.scene.snake.length > 0) {
-            this.scene.snake.forEach(segment => {
+        if (this.scene.snake && this.scene.snake.body.length > 0) {
+            this.scene.snake.body.forEach(segment => {
                 this.visualizeBounds(segment);
             });
         }
@@ -74,7 +74,7 @@ export default class DebugSystem {
             if (this.scene.direction) {
                 this.debugTexts.push(this.scene.add.text(10, 70, `Direction: (${this.scene.direction.x}, ${this.scene.direction.y})`, { fontSize: '12px', fill: '#FFF' }));
             }
-            this.debugTexts.push(this.scene.add.text(10, 85, `Snake Length: ${this.scene.snake.length}`, { fontSize: '12px', fill: '#FFF' }));
+            this.debugTexts.push(this.scene.add.text(10, 85, `Snake Length: ${this.scene.snake.body.length}`, { fontSize: '12px', fill: '#FFF' }));
             this.debugTexts.push(this.scene.add.text(10, 100, `Game State: ${this.scene.isGameOver ? "Game Over" : "Running"}`, { fontSize: '12px', fill: '#FFF' }));
             this.debugTexts.push(this.scene.add.text(10, 115, `Move Time: ${this.scene.moveTime}`, { fontSize: '12px', fill: '#FFF' }));
             if (this.scene.food) {
@@ -117,9 +117,9 @@ export default class DebugSystem {
     }
 
     visualizeTipOfSnake() {
-        const headCenter = this.scene.snake[0].getCenter();
-        let tipX = headCenter.x + this.scene.direction.x / 2;
-        let tipY = headCenter.y + this.scene.direction.y / 2;
+        const headCenter = this.scene.snake.body[0].getCenter();
+        let tipX = headCenter.x + this.scene.snake.direction.x / 2;
+        let tipY = headCenter.y + this.scene.snake.direction.y / 2;
 
         let rect = this.scene.add.rectangle(tipX, tipY, 3, 3, 0xffff00, 0).setStrokeStyle(1, 0xffff00);
 
