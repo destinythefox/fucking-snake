@@ -1,14 +1,31 @@
 export default class DebugSystem {
     constructor(scene, gameWidth, gameHeight) {
         this.scene = scene; // Reference to this scene
+        
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
-        this.debugMode = false; // Track if debug mode is active
+
         this.debugTexts = []; // Store references to all debug text objects
+        
+        this.debugMode = false; // Track if debug mode is active
+        this.logging = false;
+
+        //Add key press listeners
+        this.scene.input.keyboard.on('keydown-D', () => {
+            this.toggleDebugMode();
+        });
+
+        this.scene.input.keyboard.on('keydown-L', () => {
+            this.toggleLogging();
+        });
     }
 
     toggleDebugMode() {
         this.debugMode = !this.debugMode;
+    }
+
+    toggleLogging(){
+        this.logging = !this.logging;
     }
 
     
@@ -28,7 +45,7 @@ export default class DebugSystem {
     const memory = (performance && performance.memory && performance.memory.usedJSHeapSize) 
         ? (performance.memory.usedJSHeapSize / 1048576).toFixed(2) + ' MB' 
         : 'N/A';
-    const snakeLength = this.scene.snake.length;
+    const snakeLength = this.scene.snake.body.length;
 
     //this.clearDebugTexts();
 
@@ -46,8 +63,8 @@ export default class DebugSystem {
         this.visualizeBounds(this.scene.food);
         this.visualizeTipOfSnake();
 
-        if (this.scene.snake && this.scene.snake.length > 0) {
-            this.scene.snake.forEach(segment => {
+        if (this.scene.snake && this.scene.snake.body.length > 0) {
+            this.scene.snake.body.forEach(segment => {
                 this.visualizeBounds(segment);
             });
         }
@@ -74,7 +91,7 @@ export default class DebugSystem {
             if (this.scene.direction) {
                 this.debugTexts.push(this.scene.add.text(10, 70, `Direction: (${this.scene.direction.x}, ${this.scene.direction.y})`, { fontSize: '12px', fill: '#FFF' }));
             }
-            this.debugTexts.push(this.scene.add.text(10, 85, `Snake Length: ${this.scene.snake.length}`, { fontSize: '12px', fill: '#FFF' }));
+            this.debugTexts.push(this.scene.add.text(10, 85, `Snake Length: ${this.scene.snake.body.length}`, { fontSize: '12px', fill: '#FFF' }));
             this.debugTexts.push(this.scene.add.text(10, 100, `Game State: ${this.scene.isGameOver ? "Game Over" : "Running"}`, { fontSize: '12px', fill: '#FFF' }));
             this.debugTexts.push(this.scene.add.text(10, 115, `Move Time: ${this.scene.moveTime}`, { fontSize: '12px', fill: '#FFF' }));
             if (this.scene.food) {
@@ -97,7 +114,10 @@ export default class DebugSystem {
     }
 
     logFunctionCall(funcName) {
-        console.log(`Function ${funcName} called.`);
+        if(!this.logging)
+            return;
+
+        console.log(`Logging: ${funcName}`);
     }
 
     pauseGame() {
@@ -117,18 +137,12 @@ export default class DebugSystem {
     }
 
     visualizeTipOfSnake() {
-        const headCenter = this.scene.snake[0].getCenter();
-        let tipX = headCenter.x + this.scene.direction.x / 2;
-        let tipY = headCenter.y + this.scene.direction.y / 2;
+        const headCenter = this.scene.snake.body[0].getCenter();
+        let tipX = headCenter.x + this.scene.snake.direction.x / 2;
+        let tipY = headCenter.y + this.scene.snake.direction.y / 2;
 
         let rect = this.scene.add.rectangle(tipX, tipY, 3, 3, 0xffff00, 0).setStrokeStyle(1, 0xffff00);
 
-        //const tipX = this.scene.snake[0].x + this.scene.direction.x;
-        //const tipY = this.scene.snake[0].y + this.scene.direction.y;
-        //console.log("TipX: " + tipX + "| TipY: " + tipY);
-        //console.log(rect);
-
-        //const circle = this.scene.add.rectangle(tipX, tipY, 8, 8, 0xff0000);
         this.debugTexts.push(rect);
     }
 
