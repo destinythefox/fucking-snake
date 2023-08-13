@@ -3,6 +3,7 @@ import StateMachine from './StateMachine.js';
 
 const config = {
     type: Phaser.AUTO,
+    parent: 'game-container',
     width: 640,
     height: 480,
     backgroundColor: "#1b1b1b",
