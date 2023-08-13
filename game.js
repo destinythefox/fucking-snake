@@ -40,7 +40,7 @@ function create() {
     // Define the play state
     this.gameStates.add('play', {
         enter: function() {
-            console.log('Entered play state');
+            this.debugSystem.logFunctionCall('Entered play state');
         },
         update: function(time) {
             if (isGameOver) return;
@@ -56,18 +56,18 @@ function create() {
             }
         },
         exit: function() {
-            console.log('Exited play state');
+            this.debugSystem.logFunctionCall('Exited play state');
         }
     });
 
     // Define the pause state
     this.gameStates.add('pause', {
         enter: function() {
-            console.log('Entered pause state');
+            this.debugSystem.logFunctionCall('Entered pause state');
             this.pausedText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 'Game Paused', { fontSize: '32px', fill: '#FFF' }).setOrigin(0.5);
         },
         exit: function() {
-            console.log('Exited pause state');
+            this.debugSystem.logFunctionCall('Exited pause state');
             if (this.pausedText) {
                 this.pausedText.destroy();
             }
@@ -110,11 +110,9 @@ function update(time) {
         this.debugSystem.logFunctionCall('update');
         this.debugSystem.display();
 
-        //this.debugSystem.displayInfo();
-        //this.debugSystem.displayVariables();
-        //Debug
-        console.log("Food:", this.food);
-        console.log("Snake:", this.snake);
+        
+        this.debugSystem.logFunctionCall("Food: " + this.food)
+       this.debugSystem.logFunctionCall("Snake: " + this.snake);
     }
     else{
         this.debugSystem.clearDebugTexts();
