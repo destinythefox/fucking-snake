@@ -1,52 +1,9 @@
 import DebugSystem from './DebugSystem.js';
 import StateMachine from './StateMachine.js';
+import Snake from './GameLogic.js';
 
 let cursors;
-let scoreText;
 let isGameOver = false;
-
-class Snake {
-    constructor(scene){
-        this.scene = scene;
-        
-        this.color = 0x00ff00;
-        this.body = [this.scene.add.rectangle(320, 240, 16, 16, this.color).setOrigin(0,0)]
-        this.direction = new Phaser.Geom.Point(16, 0);
-
-        console.log(this.body);
-    }
-
-    move() {
-        for (let i = this.body.length - 1; i > 0; i--) {
-            this.body[i].setPosition(this.body[i - 1].x, this.body[i - 1].y);
-        }
-
-        this.body[0].x = Phaser.Math.Wrap(this.body[0].x + this.direction.x, 0, config.width);
-        this.body[0].y = Phaser.Math.Wrap(this.body[0].y + this.direction.y, 0, config.height);
-    }
-
-    flash(callback){
-        const maxFlashes = config.snakeFlashFrequency;
-        const totalDuration = maxFlashes * config.snakeFlashDuration;
-    
-        this.scene.tweens.add({
-            targets: this.body,
-            alpha: 0.5,
-            duration: config.snakeFlashDuration / 2,
-            yoyo: true,
-            repeat: maxFlashes - 1,
-            onComplete: function() {
-                this.body.forEach(segment => segment.alpha = 1);
-                callback(this.scene);
-            }.bind(this)
-        });
-    }
-
-    extend(){
-        let tail = this.body[this.body.length - 1];
-        this.body.push(this.scene.add.rectangle(tail.x, tail.y, 16, 16, this.color).setOrigin(0,0));
-    }
-}
 
 class StartMenuScene extends Phaser.Scene {
     constructor(){
@@ -73,24 +30,16 @@ class GameScene extends Phaser.Scene {
     preload() {}
 
     create() {
-        this.debugSystem = new DebugSystem(this, config.width, config.height);
-        this.debugSystem.logFunctionCall('create');
-
-
-        this.snake = new Snake(this);
-
         //Define scene variables
-        //this.snake = [this.add.rectangle(320, 240, 16, 16, 0x00ff00).setOrigin(0,0)];
+        this.snake = new Snake(this, config);
         this.direction = new Phaser.Geom.Point(16, 0);
         this.food = this.add.rectangle(Phaser.Math.Between(0, 39) * 16, Phaser.Math.Between(0, 29) * 16, 16, 16, 0xff0000).setOrigin(0,0);
         this.score = 0;
-        scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '24px', fill: '#FFF' });
+        this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '24px', fill: '#FFF' });
         this.moveTime = 0;
         cursors = this.input.keyboard.createCursorKeys();
         isGameOver = false;
         
-
-
         // Initialize the state machine
         this.gameStates = new StateMachine(this);
     
@@ -132,10 +81,7 @@ class GameScene extends Phaser.Scene {
                 }
             }
         });
-    
-        // Start the game in the play state
-        this.gameStates.change('play');
-    
+
         this.input.keyboard.on('keydown-P', () => {
             if (this.gameStates.currentState === 'play') {
                 this.gameStates.change('pause');
@@ -144,7 +90,12 @@ class GameScene extends Phaser.Scene {
             }
         });
     
+        this.debugSystem = new DebugSystem(this, config.width, config.height);
+        this.debugSystem.logFunctionCall('create');
 
+            
+        // Start the game in the play state
+        this.gameStates.change('play');
     }
 
     update(time){
@@ -185,7 +136,7 @@ class GameScene extends Phaser.Scene {
             this.snake.extend();
             this.food.setPosition(Phaser.Math.Between(0, 39) * 16, Phaser.Math.Between(0, 29) * 16);
             this.score += 10;
-            scoreText.setText('Score: ' + this.score);
+            this.scoreText.setText('Score: ' + this.score);
         }
     }
     
@@ -255,4 +206,3 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
-
