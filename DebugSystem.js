@@ -117,7 +117,7 @@ export default class DebugSystem {
         if(!this.logging)
             return;
 
-        console.log(`Function ${funcName} called.`);
+        console.log(`Logging: ${funcName}`);
     }
 
     pauseGame() {
