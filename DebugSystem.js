@@ -1,14 +1,31 @@
 export default class DebugSystem {
     constructor(scene, gameWidth, gameHeight) {
         this.scene = scene; // Reference to this scene
+        
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
-        this.debugMode = false; // Track if debug mode is active
+
         this.debugTexts = []; // Store references to all debug text objects
+        
+        this.debugMode = false; // Track if debug mode is active
+        this.logging = false;
+
+        //Add key press listeners
+        this.scene.input.keyboard.on('keydown-D', () => {
+            this.toggleDebugMode();
+        });
+
+        this.scene.input.keyboard.on('keydown-L', () => {
+            this.toggleLogging();
+        });
     }
 
     toggleDebugMode() {
         this.debugMode = !this.debugMode;
+    }
+
+    toggleLogging(){
+        this.logging = !this.logging;
     }
 
     
@@ -97,6 +114,9 @@ export default class DebugSystem {
     }
 
     logFunctionCall(funcName) {
+        if(!this.logging)
+            return;
+
         console.log(`Function ${funcName} called.`);
     }
 
@@ -123,12 +143,6 @@ export default class DebugSystem {
 
         let rect = this.scene.add.rectangle(tipX, tipY, 3, 3, 0xffff00, 0).setStrokeStyle(1, 0xffff00);
 
-        //const tipX = this.scene.snake[0].x + this.scene.direction.x;
-        //const tipY = this.scene.snake[0].y + this.scene.direction.y;
-        //console.log("TipX: " + tipX + "| TipY: " + tipY);
-        //console.log(rect);
-
-        //const circle = this.scene.add.rectangle(tipX, tipY, 8, 8, 0xff0000);
         this.debugTexts.push(rect);
     }
 

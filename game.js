@@ -139,10 +139,6 @@ class GameScene extends Phaser.Scene {
             }
         });
     
-        this.input.keyboard.on('keydown-D', () => {
-        this.debugSystem.toggleDebugMode();
-    });
-    
         this.debugSystem = new DebugSystem(this, config.width, config.height);
         this.debugSystem.logFunctionCall('create');
     }
@@ -247,6 +243,7 @@ const config = {
     parent: 'game-container',
     width: 640,
     height: 480,
+    version: 0.15,
     backgroundColor: "#1b1b1b",
     scene: [StartMenuScene, GameScene], 
     snakeFlashFrequency: 3,  // Number of times the snake should flash
