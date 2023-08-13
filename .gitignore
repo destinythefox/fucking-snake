@@ -50,3 +50,8 @@ Thumbs.db
 *.mov
 *.wmv
 
+game.js.orig
+game_BACKUP_2106.js
+game_BASE_2106.js
+game_LOCAL_2106.js
+game_REMOTE_2106.js
