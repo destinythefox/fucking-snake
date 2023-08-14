@@ -17,9 +17,7 @@ export class GameScene extends Phaser.Scene {
     preload() {}
 
     create() {
-        //Initialize Debug System
-        this.debugSystem = new DebugSystem(this, config.width, config.height);
-        this.debugSystem.log('create');
+        
 
         //Define scene variables
         this.snake = new Snake(this, config);
@@ -85,6 +83,10 @@ export class GameScene extends Phaser.Scene {
     
         // Start the game in the play state
         this.gameStates.change('play');
+
+        //Initialize Debug System
+        this.debugSystem = new DebugSystem(this, config.width, config.height);
+        this.debugSystem.log('create');
     }
 
     update(time){
