@@ -1,28 +1,9 @@
-import DebugSystem from './DebugSystem.js';
-import StateMachine from './StateMachine.js';
-import Snake from './GameLogic.js';
+import DebugSystem from '../systems/DebugSystem.js';
+import StateMachine from '../utils/StateMachine.js';
+import Snake from '../entities/Snake.js';
+import config from '../game.js';
 
-let cursors;
-let isGameOver = false;
-
-class StartMenuScene extends Phaser.Scene {
-    constructor(){
-        super("menuScene");
-    }
-
-    preload() {}
-    
-    create() 
-    {
-        this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 'Click to Start', { fontSize: '24px', fill: '#FF0000' }).setOrigin(0.5).setInteractive().on('pointerdown', () => {
-            this.scene.start("gameScene");
-        });
-    }
-
-    update() {}
-}
-
-class GameScene extends Phaser.Scene {
+export class GameScene extends Phaser.Scene {
     constructor() {
         super("gameScene");
     }
@@ -37,8 +18,8 @@ class GameScene extends Phaser.Scene {
         this.score = 0;
         this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '24px', fill: '#FFF' });
         this.moveTime = 0;
-        cursors = this.input.keyboard.createCursorKeys();
-        isGameOver = false;
+        this.cursors = this.input.keyboard.createCursorKeys();
+        this.isGameOver = false;
         
         // Initialize the state machine
         this.gameStates = new StateMachine(this);
@@ -49,8 +30,7 @@ class GameScene extends Phaser.Scene {
             this.debugSystem.logFunctionCall('Entered play state');
             },
             update: function(time) {
-                if (isGameOver) return;
-
+                if (this.isGameOver) return;
 
                 if (time >= this.moveTime) {
     
@@ -100,14 +80,13 @@ class GameScene extends Phaser.Scene {
 
     update(time){
         this.gameStates.update(time);
-
+        
         if (this.debugSystem.debugMode) {
             this.debugSystem.logFunctionCall('update');
             this.debugSystem.display();
     
-        
-        this.debugSystem.logFunctionCall("Food: " + this.food)
-       this.debugSystem.logFunctionCall("Snake: " + this.snake);
+            this.debugSystem.logFunctionCall("Food: " + this.food)
+            this.debugSystem.logFunctionCall("Snake: " + this.snake);
         }
         else{
             this.debugSystem.clearDebugTexts();
@@ -115,13 +94,13 @@ class GameScene extends Phaser.Scene {
     }
 
     handleInput() {
-        if (cursors.left.isDown && this.snake.direction.x === 0) {
+        if (this.cursors.left.isDown && this.snake.direction.x === 0) {
             this.snake.direction.setTo(-16, 0);
-        } else if (cursors.right.isDown && this.snake.direction.x === 0) {
+        } else if (this.cursors.right.isDown && this.snake.direction.x === 0) {
             this.snake.direction.setTo(16, 0);
-        } else if (cursors.up.isDown && this.snake.direction.y === 0) {
+        } else if (this.cursors.up.isDown && this.snake.direction.y === 0) {
             this.snake.direction.setTo(0, -16);
-        } else if (cursors.down.isDown && this.snake.direction.y === 0) {
+        } else if (this.cursors.down.isDown && this.snake.direction.y === 0) {
             this.snake.direction.setTo(0, 16);
         }
     }
@@ -177,7 +156,7 @@ class GameScene extends Phaser.Scene {
     }
     
     gameOver(scene) {
-        isGameOver = true;
+        scene.isGameOver = true;
         scene.add.text(320, 240, 'Game Over', { fontSize: '48px', fill: '#FF0000' }).setOrigin(0.5);
         scene.add.text(320, 290, 'Click to Restart', { fontSize: '24px', fill: '#FF0000' }).setOrigin(0.5).setInteractive().on('pointerdown', () => {
     
@@ -193,16 +172,4 @@ class GameScene extends Phaser.Scene {
     }
 }
 
-const config = {
-    type: Phaser.AUTO,
-    parent: 'game-container',
-    width: 640,
-    height: 480,
-    version: 0.15,
-    backgroundColor: "#1b1b1b",
-    scene: [StartMenuScene, GameScene], 
-    snakeFlashFrequency: 3,  // Number of times the snake should flash
-    snakeFlashDuration: 200  // Duration of each flash in milliseconds
-};
-
-const game = new Phaser.Game(config);
+export default GameScene;

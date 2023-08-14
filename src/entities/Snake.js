@@ -4,10 +4,11 @@ class Snake {
         this.scene = scene;
         
         this.color = 0x00ff00;
+        this.flashCount = 3,  // Number of times the snake should flash
+        this.flashDurationMS = 200  // Duration of each flash in milliseconds
+
         this.body = [this.scene.add.rectangle(320, 240, 16, 16, this.color).setOrigin(0,0)]
         this.direction = new Phaser.Geom.Point(16, 0);
-
-        console.log(this.body);
     }
 
     move() {
@@ -20,15 +21,13 @@ class Snake {
     }
 
     flash(callback){
-        const maxFlashes = this.config.snakeFlashFrequency;
-        const totalDuration = maxFlashes * this.config.snakeFlashDuration;
-    
+
         this.scene.tweens.add({
             targets: this.body,
             alpha: 0.5,
-            duration: this.config.snakeFlashDuration / 2,
+            duration: this.flashDurationMS / 2,
             yoyo: true,
-            repeat: maxFlashes - 1,
+            repeat: this.flashCount - 1,
             onComplete: function() {
                 this.body.forEach(segment => segment.alpha = 1);
                 callback(this.scene);

@@ -6,7 +6,6 @@
     100% { background-color: #1b1b1b; }
 }
 
-
 body, html {
     height: 100%;
     margin: 0;
@@ -17,7 +16,6 @@ body, html {
     background-color: #1b1b1b; /* or any desired background color */
     overflow: hidden; /* Optional: to prevent any scrolling */
     animation: colorChange 5s infinite; /* Adjust the duration (10s) as needed */
-
 }
 
 #game-container {
