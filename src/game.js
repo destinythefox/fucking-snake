@@ -9,6 +9,13 @@ const config = {
     version: 0.15,
     backgroundColor: "#1b1b1b",
     scene: [StartMenuScene, GameScene]
+    plugins: {
+        global: [{
+            key: 'Time',
+            plugin: Phaser.Plugins.TimePlugin,
+            start: true
+        }]
+    }
 };
 export default config; 
 

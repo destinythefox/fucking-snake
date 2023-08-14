@@ -7,10 +7,7 @@ import Portal from '../entities/Portals.js';
 
 export class GameScene extends Phaser.Scene {
     constructor() {
-        super({
-            key: 'gameScene',
-            plugins: ['Time']
-        });
+        super("gameScene");
 
     }
 
