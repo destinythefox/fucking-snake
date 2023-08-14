@@ -1,7 +1,7 @@
 export default class DebugSystem {
     constructor(scene, gameWidth, gameHeight) {
         this.scene = scene; // Reference to this scene
-        
+
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
 

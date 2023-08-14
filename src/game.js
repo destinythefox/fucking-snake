@@ -8,7 +8,7 @@ const config = {
     height: 480,
     version: 0.15,
     backgroundColor: "#1b1b1b",
-    scene: [StartMenuScene, GameScene]
+    scene: [StartMenuScene, GameScene],
     plugins: {
         global: [{
             key: 'Time',

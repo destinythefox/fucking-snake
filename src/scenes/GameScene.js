@@ -78,12 +78,13 @@ export class GameScene extends Phaser.Scene {
         this.portal = new Portal(this, 100, 100, 500, 400);
 
     
-        // Start the game in the play state
-        this.gameStates.change('play');
-
         //Initialize Debug System
         this.debugSystem = new DebugSystem(this, config.width, config.height);
         this.debugSystem.log('create');
+        
+        // Start the game in the play state
+        this.gameStates.change('play');
+
     }
 
     update(time){
