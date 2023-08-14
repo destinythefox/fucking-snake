@@ -18,6 +18,10 @@ export default class DebugSystem {
         this.scene.input.keyboard.on('keydown-L', () => {
             this.toggleLogging();
         });
+
+        this.scene.input.keyboard.on('keydown-G', () => {
+            this.scene.snake.extend();
+        });
     }
 
     toggleDebugMode() {
@@ -75,6 +79,13 @@ export default class DebugSystem {
         // Reset food color to original
         this.scene.food.setFillStyle(0xff0000); // Original red color
     }
+
+
+    //Outline screen in debug mode
+    let rect = this.scene.add.rectangle(0, 0, 640, 480, 0xffff00, 0).setStrokeStyle(8, 0xFF0000).setOrigin(0,0);
+    this.debugTexts.push(rect);
+
+    this.debugTexts.push(this.scene.add.text(10 , this.gameHeight - 30, `Logging Enabled: ${this.logging}`, { fontSize: '12px', fill: '#FFF' }).setOrigin(0, 0));
 }
 
 
