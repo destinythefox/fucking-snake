@@ -2,10 +2,16 @@ import DebugSystem from '../systems/DebugSystem.js';
 import StateMachine from '../utils/StateMachine.js';
 import Snake from '../entities/Snake.js';
 import config from '../game.js';
+import Portal from '../entities/Portals.js';
+
 
 export class GameScene extends Phaser.Scene {
     constructor() {
-        super("gameScene");
+        super({
+            key: 'gameScene',
+            plugins: ['Time']
+        });
+
     }
 
     preload() {}
@@ -73,6 +79,9 @@ export class GameScene extends Phaser.Scene {
                 this.gameStates.change('play');
             }
         });
+
+        this.portal = new Portal(this, 100, 100, 500, 400);
+
     
         // Start the game in the play state
         this.gameStates.change('play');
@@ -91,6 +100,9 @@ export class GameScene extends Phaser.Scene {
         else{
             this.debugSystem.clearDebugTexts();
         }
+
+
+        this.portal.teleport(this.snake.body[0]);
     }
 
     handleInput() {
