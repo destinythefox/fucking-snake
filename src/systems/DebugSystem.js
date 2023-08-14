@@ -44,14 +44,11 @@ export default class DebugSystem {
    displayInfo() {
     console.log('Displaying debug information...');
 
-
     const fps = Math.round(1000 / this.scene.game.loop.delta);
     const memory = (performance && performance.memory && performance.memory.usedJSHeapSize) 
         ? (performance.memory.usedJSHeapSize / 1048576).toFixed(2) + ' MB' 
         : 'N/A';
     const snakeLength = this.scene.snake.body.length;
-
-    //this.clearDebugTexts();
 
     // Display FPS at the bottom right
     this.debugTexts.push(this.scene.add.text(this.gameWidth - 100, this.gameHeight - 70, `FPS: ${fps}`, { fontSize: '12px', fill: '#FFF' }).setOrigin(1, 1));
@@ -95,8 +92,6 @@ export default class DebugSystem {
     }
 
     displayVariables() {
-        //this.clearDebugTexts();
-
         if (this.scene) {
             this.debugTexts.push(this.scene.add.text(10, 55, `Score: ${this.scene.score}`, { fontSize: '12px', fill: '#FFF' }));
             if (this.scene.direction) {
@@ -124,11 +119,11 @@ export default class DebugSystem {
         this.debugTexts.push(collisionText);
     }
 
-    logFunctionCall(funcName) {
+    log(message) {
         if(!this.logging)
             return;
 
-        console.log(`Logging: ${funcName}`);
+        console.log(`Logging: ${message}`);
     }
 
     pauseGame() {

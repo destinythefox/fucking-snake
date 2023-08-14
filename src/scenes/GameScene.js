@@ -11,6 +11,10 @@ export class GameScene extends Phaser.Scene {
     preload() {}
 
     create() {
+        //Initialize Debug System
+        this.debugSystem = new DebugSystem(this, config.width, config.height);
+        this.debugSystem.log('create');
+
         //Define scene variables
         this.snake = new Snake(this, config);
         this.direction = new Phaser.Geom.Point(16, 0);
@@ -27,7 +31,7 @@ export class GameScene extends Phaser.Scene {
         // Define the play state
         this.gameStates.add('play', {
             enter: function() {
-            this.debugSystem.logFunctionCall('Entered play state');
+            this.debugSystem.log('Entered play state');
             },
             update: function(time) {
                 if (this.isGameOver) return;
@@ -44,18 +48,18 @@ export class GameScene extends Phaser.Scene {
                 }
             },
             exit: function() {
-            this.debugSystem.logFunctionCall('Exited play state');
+            this.debugSystem.log('Exited play state');
             }
         });
     
         // Define the pause state
         this.gameStates.add('pause', {
             enter: function() {
-            this.debugSystem.logFunctionCall('Entered pause state');
+            this.debugSystem.log('Entered pause state');
                 this.pausedText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 'Game Paused', { fontSize: '32px', fill: '#FFF' }).setOrigin(0.5);
             },
             exit: function() {
-            this.debugSystem.logFunctionCall('Exited pause state');
+            this.debugSystem.log('Exited pause state');
                 if (this.pausedText) {
                     this.pausedText.destroy();
                 }
@@ -70,23 +74,19 @@ export class GameScene extends Phaser.Scene {
             }
         });
     
-        this.debugSystem = new DebugSystem(this, config.width, config.height);
-        this.debugSystem.logFunctionCall('create');
-
-            
         // Start the game in the play state
         this.gameStates.change('play');
     }
 
     update(time){
+        this.debugSystem.log('update');
         this.gameStates.update(time);
         
+        this.debugSystem.log("Food: " + this.food)
+        this.debugSystem.log("Snake: " + this.snake);
+
         if (this.debugSystem.debugMode) {
-            this.debugSystem.logFunctionCall('update');
             this.debugSystem.display();
-    
-            this.debugSystem.logFunctionCall("Food: " + this.food)
-            this.debugSystem.logFunctionCall("Snake: " + this.snake);
         }
         else{
             this.debugSystem.clearDebugTexts();
