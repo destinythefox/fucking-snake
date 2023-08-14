@@ -36,16 +36,9 @@ export class GameScene extends Phaser.Scene {
             update: function(time) {
                 if (this.isGameOver) return;
 
-                if (time >= this.moveTime) {
-    
-                    this.handleInput.call(this);
-
-                    this.snake.move();
-                    this.checkSelfCollision(this);
-                    this.checkFoodCollision(this);
-    
-                    this.moveTime = time + 100; // Updated move speed
-                }
+                this.handleInput();
+                
+                this.snake.update(time);
             },
             exit: function() {
             this.debugSystem.log('Exited play state');
