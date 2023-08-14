@@ -10,6 +10,6 @@ const config = {
     backgroundColor: "#1b1b1b",
     scene: [StartMenuScene, GameScene]
 };
-export default config; 
+export default config;
 
 const game = new Phaser.Game(config);
