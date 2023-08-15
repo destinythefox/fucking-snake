@@ -34,10 +34,10 @@ export default class Portal {
         this.exit.setVisible(true);
 
         while (!validLocation) {
-            const portal1X = Phaser.Math.Between(0, 39) * 16;
-            const portal1Y = Phaser.Math.Between(0, 29) * 16;
-            const portal2X = Phaser.Math.Between(0, 39) * 16;
-            const portal2Y = Phaser.Math.Between(0, 29) * 16;
+            const portal1X = Phaser.Math.Between(0, 39) * 16 + PORTAL_SIZE / 2; // Adjusted for half the size of a grid cell
+            const portal1Y = Phaser.Math.Between(0, 29) * 16 + PORTAL_SIZE / 2; // Adjusted for half the size of a grid cell
+            const portal2X = Phaser.Math.Between(0, 39) * 16 + PORTAL_SIZE / 2; // Adjusted for half the size of a grid cell
+            const portal2Y = Phaser.Math.Between(0, 29) * 16 + PORTAL_SIZE / 2; // Adjusted for half the size of a grid cell
 
             if (!this.isLocationOccupied(portal1X, portal1Y, snake, food) && 
                 !this.isLocationOccupied(portal2X, portal2Y, snake, food)) {
