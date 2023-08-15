@@ -27,7 +27,6 @@ export class GameScene extends Phaser.Scene {
         this.isGameOver = false;
         this.foodEaten = 0;
         this.portal = new Portal(this);
-        this.toggleGridKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.V);
 
 
         
@@ -108,9 +107,7 @@ export class GameScene extends Phaser.Scene {
 
         this.portal.teleport(this.snake.body[0]);
 
-        if (this.debugSystem.debugMode && Phaser.Input.Keyboard.JustDown(this.toggleGridKey)) {
-            this.debugSystem.toggleGrid();
-        }
+        
     }
 
     handleInput() {
