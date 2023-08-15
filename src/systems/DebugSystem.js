@@ -9,8 +9,10 @@ export default class DebugSystem {
         
         this.debugMode = false; // Track if debug mode is active
         this.logging = false;
+        this.gridDrawn = false;
 
         //Add key press listeners
+        
         this.scene.input.keyboard.on('keydown-D', () => {
             this.toggleDebugMode();
         });
@@ -38,6 +40,10 @@ export default class DebugSystem {
 
         this.displayVariables();
         this.displayInfo();
+
+        if (this.debugMode) {
+            this.visualizeGrid();
+        }
     }
 
 
@@ -102,6 +108,7 @@ export default class DebugSystem {
             this.debugTexts.push(this.scene.add.text(10, 115, `Move Time: ${this.scene.moveTime}`, { fontSize: '12px', fill: '#FFF' }));
             if (this.scene.food) {
                 this.debugTexts.push(this.scene.add.text(10, 130, `Food Position: (${this.scene.food.x}, ${this.scene.food.y})`, { fontSize: '12px', fill: '#FFF' }));
+                this.debugTexts.push(this.scene.add.text(10, 160, `Food Eaten: ${this.scene.foodEaten}`, { fontSize: '12px', fill: '#FFF' }));
             }
             // Display the current state of the state machine
             this.debugTexts.push(this.scene.add.text(10, 145, `Current State: ${this.scene.gameStates.currentState}`, { fontSize: '12px', fill: '#FFF' }));
@@ -163,5 +170,41 @@ export default class DebugSystem {
 
     this.debugTexts.push(rect);
     }
+
+
+
+visualizeGrid() {
+    const gridSize = 16; // Assuming each grid cell is 16x16 pixels
+    const gameWidth = this.gameWidth;
+    const gameHeight = this.gameHeight;
+
+    for (let x = 0; x <= gameWidth; x += gridSize) {
+        const line = this.scene.add.line(0, 0, x, 0, x, gameHeight, 0x00FF00).setOrigin(0, 0);
+        this.debugTexts.push(line);
+    }
+
+    for (let y = 0; y <= gameHeight; y += gridSize) {
+        const line = this.scene.add.line(0, 0, 0, y, gameWidth, y, 0x00FF00).setOrigin(0, 0);
+        this.debugTexts.push(line);
+    }
+}
+
+toggleGrid() {
+    if (!this.gridDrawn) {
+        this.visualizeGrid();
+        this.gridDrawn = true;
+    } else {
+        this.clearGrid();
+        this.gridDrawn = false;
+    }
+}
+
+clearGrid() {
+    this.debugTexts.forEach(item => {
+        if (item.type === "Line") {
+            item.destroy();
+        }
+    });
+}
 
 }
