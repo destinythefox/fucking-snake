@@ -95,6 +95,7 @@ export default class DebugSystem {
 
     displayVariables() {
         if (this.scene) {
+            this.debugTexts.push(this.scene.add.text(10, 175, `Can Use Portal: ${this.scene.portal.canUsePortal}`, { fontSize: '12px', fill: '#FFF' }));
             this.debugTexts.push(this.scene.add.text(10, 55, `Score: ${this.scene.score}`, { fontSize: '12px', fill: '#FFF' }));
             if (this.scene.direction) {
                 this.debugTexts.push(this.scene.add.text(10, 70, `Direction: (${this.scene.direction.x}, ${this.scene.direction.y})`, { fontSize: '12px', fill: '#FFF' }));
