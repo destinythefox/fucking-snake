@@ -1,6 +1,8 @@
 const PORTAL_SIZE = 16; // Size of one grid segment
 const ENTRY_COLOR = 0xFFA500; // Orange color
 const EXIT_COLOR = 0x0000FF; // Blue color
+import DebugSystem from '../systems/DebugSystem.js';
+
 
 export default class Portal {
     constructor(scene, color) {
