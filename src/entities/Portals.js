@@ -1,6 +1,8 @@
 const PORTAL_SIZE = 16; // Size of one grid segment
 const ENTRY_COLOR = 0xFFA500; // Orange color
 const EXIT_COLOR = 0x0000FF; // Blue color
+import DebugSystem from '../systems/DebugSystem.js';
+
 
 export default class Portal {
     constructor(scene) {
@@ -12,6 +14,11 @@ export default class Portal {
         this.exit.setVisible(false);
     }
 
+    resetPortalUsage() {
+    console.log("Setting canUsePortal to true");
+    this.canUsePortal = true;
+}
+
     teleport(snakeHead) {
          if (!this.canUsePortal) {
             return; // Exit the function if the portal can't be used
@@ -21,10 +28,9 @@ export default class Portal {
         } else if (Phaser.Geom.Intersects.RectangleToRectangle(snakeHead.getBounds(), this.exit.getBounds())) {
             snakeHead.setPosition(this.entry.x, this.entry.y);
         }
+        console.log("Setting canUsePortal to false");
         this.canUsePortal = false;
-        this.scene.time.delayedCall(2000, () => {
-            this.canUsePortal = true;
-        });
+        this.scene.time.delayedCall(2000, this.resetPortalUsage, [], this);
     }
 
     spawn(snake, food) {
