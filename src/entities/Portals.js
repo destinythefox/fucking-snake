@@ -3,28 +3,44 @@ const ENTRY_COLOR = 0xFFA500; // Orange color
 const EXIT_COLOR = 0x0000FF; // Blue color
 
 export default class Portal {
-    constructor(scene) {
+    constructor(scene, color) {
+        this.color = color;
+        this.linkedPortal;
+
         this.scene = scene;
-        this.entry = this.scene.add.circle(0, 0, PORTAL_SIZE / 2, ENTRY_COLOR); // Divided by 2 because it's a circle's radius
-        this.exit = this.scene.add.circle(0, 0, PORTAL_SIZE / 2, EXIT_COLOR); // Divided by 2 because it's a circle's radius
-        this.canUsePortal = true;
-        this.entry.setVisible(false);
-        this.exit.setVisible(false);
+
+        this.body = this.scene.add.circle(0, 0, PORTAL_SIZE / 2, color);
     }
 
-    teleport(snakeHead) {
-         if (!this.canUsePortal) {
-            return; // Exit the function if the portal can't be used
+    teleport(snake) {
+        if(!this.linkedPortal){ //Return if no connected portal
+            return;
         }
-        if (Phaser.Geom.Intersects.RectangleToRectangle(snakeHead.getBounds(), this.entry.getBounds())) {
-            snakeHead.setPosition(this.exit.x, this.exit.y);
-        } else if (Phaser.Geom.Intersects.RectangleToRectangle(snakeHead.getBounds(), this.exit.getBounds())) {
-            snakeHead.setPosition(this.entry.x, this.entry.y);
+
+        let snakeHead = snake.body[0];
+        let snakeHeadCenter = snakeHead.getCenter();
+
+        if(this.linkedPortal.body.getBounds().contains(snakeHeadCenter.x, snakeHeadCenter.y)) {
+            let portalTopLeft =  new Phaser.Geom.Point(this.linkedPortal.body.x - 8, this.linkedPortal.body.y - 8); //Get topleft origin (0,0) pos
+            let offset = new Phaser.Geom.Point(snake.direction.x, snake.direction.y); //Offset by 16, - 16 depending on snake dir
+
+            snakeHead.setPosition(portalTopLeft.x + offset.x, portalTopLeft.y + offset.y);
+
         }
-        this.canUsePortal = false;
-        this.scene.time.delayedCall(2000, () => {
-            this.canUsePortal = true;
-        });
+    }
+
+    randomPos(snake, food){
+        let validLocation = false;
+
+        while(!validLocation){
+            const x = (Phaser.Math.Between(0, 39) * 16) - PORTAL_SIZE / 2; // Adjusted for half the size of a grid cell
+            const y = (Phaser.Math.Between(0, 29) * 16) - PORTAL_SIZE / 2; // Adjusted for half the size of a grid cell
+
+            if (!this.isLocationOccupied(x, y, snake, food)) {
+                validLocation = true;
+                this.body.setPosition(x, y);
+            }
+        }
     }
 
     spawn(snake, food) {
@@ -34,10 +50,10 @@ export default class Portal {
         this.exit.setVisible(true);
 
         while (!validLocation) {
-            const portal1X = Phaser.Math.Between(0, 39) * 16 + PORTAL_SIZE / 2; // Adjusted for half the size of a grid cell
-            const portal1Y = Phaser.Math.Between(0, 29) * 16 + PORTAL_SIZE / 2; // Adjusted for half the size of a grid cell
-            const portal2X = Phaser.Math.Between(0, 39) * 16 + PORTAL_SIZE / 2; // Adjusted for half the size of a grid cell
-            const portal2Y = Phaser.Math.Between(0, 29) * 16 + PORTAL_SIZE / 2; // Adjusted for half the size of a grid cell
+            const portal1X = (Phaser.Math.Between(0, 39) * 16); //+ PORTAL_SIZE / 2; // Adjusted for half the size of a grid cell
+            const portal1Y = (Phaser.Math.Between(0, 29) * 16); //+ PORTAL_SIZE / 2; // Adjusted for half the size of a grid cell
+            const portal2X = (Phaser.Math.Between(0, 39) * 16); //+ PORTAL_SIZE / 2; // Adjusted for half the size of a grid cell
+            const portal2Y = (Phaser.Math.Between(0, 29) * 16); //+ PORTAL_SIZE / 2; // Adjusted for half the size of a grid cell
 
             if (!this.isLocationOccupied(portal1X, portal1Y, snake, food) && 
                 !this.isLocationOccupied(portal2X, portal2Y, snake, food)) {

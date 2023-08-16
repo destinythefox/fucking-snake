@@ -26,9 +26,6 @@ export class GameScene extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
         this.isGameOver = false;
         this.foodEaten = 0;
-        this.portal = new Portal(this);
-
-
         
         // Initialize the state machine
         this.gameStates = new StateMachine(this);
@@ -87,7 +84,6 @@ export class GameScene extends Phaser.Scene {
         
         // Start the game in the play state
         this.gameStates.change('play');
-
     }
 
     update(time){
@@ -104,10 +100,10 @@ export class GameScene extends Phaser.Scene {
             this.debugSystem.clearDebugTexts();
         }
 
-
-        this.portal.teleport(this.snake.body[0]);
-
-        
+        if(this.portal1 && this.portal2){ //Make sure portals exist
+            this.portal1.teleport(this.snake);
+            this.portal2.teleport(this.snake);
+        }
     }
 
     handleInput() {
@@ -136,10 +132,21 @@ export class GameScene extends Phaser.Scene {
             this.foodEaten++; // Increment the foodEaten counter
 
             if (this.foodEaten % 5 === 0) {
-            this.portal.spawn(this.snake, this.food);
+                this.createPortals();
+            }
         }
     }
-}
+
+    createPortals(){
+        this.portal1 = new Portal(this, 0xFFA500);
+        this.portal2 = new Portal(this, 0x0000FF);
+
+        this.portal1.linkedPortal = this.portal2;
+        this.portal2.linkedPortal = this.portal1;
+
+        this.portal1.randomPos(this.snake, this.food);
+        this.portal2.randomPos(this.snake, this.food);
+    }
     
     checkSelfCollision() {
         const headCenter = this.snake.body[0].getCenter();
