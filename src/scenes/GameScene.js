@@ -14,8 +14,6 @@ export class GameScene extends Phaser.Scene {
     preload() {}
 
     create() {
-        
-
         //Define scene variables
         this.snake = new Snake(this, config);
         this.direction = new Phaser.Geom.Point(16, 0);
