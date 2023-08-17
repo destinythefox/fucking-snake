@@ -2,18 +2,19 @@ import DebugSystem from '../systems/DebugSystem.js';
 import StateMachine from '../utils/StateMachine.js';
 import Snake from '../entities/Snake.js';
 import config from '../game.js';
-import Portal from '../entities/Portals.js';
-
 
 export class GameScene extends Phaser.Scene {
     constructor() {
         super("gameScene");
-
     }
 
     preload() {}
 
     create() {
+        //Initialize Debug System
+        this.debugSystem = new DebugSystem(this, config.width, config.height);
+        this.debugSystem.log('create');
+
         //Define scene variables
         this.snake = new Snake(this, config);
         this.direction = new Phaser.Geom.Point(16, 0);
@@ -23,7 +24,6 @@ export class GameScene extends Phaser.Scene {
         this.moveTime = 0;
         this.cursors = this.input.keyboard.createCursorKeys();
         this.isGameOver = false;
-        this.foodEaten = 0;
         
         // Initialize the state machine
         this.gameStates = new StateMachine(this);
@@ -66,13 +66,7 @@ export class GameScene extends Phaser.Scene {
                 this.gameStates.change('play');
             }
         });
-
-
     
-        //Initialize Debug System
-        this.debugSystem = new DebugSystem(this, config.width, config.height);
-        this.debugSystem.log('create');
-        
         // Start the game in the play state
         this.gameStates.change('play');
     }
@@ -89,11 +83,6 @@ export class GameScene extends Phaser.Scene {
         }
         else{
             this.debugSystem.clearDebugTexts();
-        }
-
-        if(this.portal1 && this.portal2){ //Make sure portals exist
-            this.portal1.teleport(this.snake);
-            this.portal2.teleport(this.snake);
         }
     }
 
@@ -120,26 +109,7 @@ export class GameScene extends Phaser.Scene {
             this.food.setPosition(Phaser.Math.Between(0, 39) * 16, Phaser.Math.Between(0, 29) * 16);
             this.score += 10;
             this.scoreText.setText('Score: ' + this.score);
-            this.foodEaten++; // Increment the foodEaten counter
-
-            if (this.foodEaten % 5 === 0) {
-                this.createPortals();
-            }
         }
-    }
-
-    createPortals(){
-        if(this.portal1) this.portal1.body.destroy();
-        if(this.portal2) this.portal2.body.destroy();
-
-        this.portal1 = new Portal(this, 0xFFA500);
-        this.portal2 = new Portal(this, 0x0000FF);
-
-        this.portal1.linkedPortal = this.portal2;
-        this.portal2.linkedPortal = this.portal1;
-
-        this.portal1.randomPos(this.snake, this.food);
-        this.portal2.randomPos(this.snake, this.food);
     }
     
     checkSelfCollision() {
