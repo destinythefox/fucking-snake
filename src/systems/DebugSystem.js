@@ -1,19 +1,21 @@
 export default class DebugSystem {
     constructor(scene, gameWidth, gameHeight) {
         this.scene = scene; // Reference to this scene
-        
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
-
         this.debugTexts = []; // Store references to all debug text objects
-        
         this.debugMode = false; // Track if debug mode is active
         this.logging = false;
+        this.gridDrawn = false;
+        this.gridLines = [];
 
-        //Add key press listeners
+        // Add key press listeners
         this.scene.input.keyboard.on('keydown-D', () => {
             this.toggleDebugMode();
         });
+
+        // Add key listener for 'V' key
+        this.scene.input.keyboard.on('keydown-V', this.toggleGrid, this);
 
         this.scene.input.keyboard.on('keydown-L', () => {
             this.toggleLogging();
@@ -38,12 +40,12 @@ export default class DebugSystem {
 
         this.displayVariables();
         this.displayInfo();
+
+        
     }
 
 
    displayInfo() {
-    console.log('Displaying debug information...');
-
     const fps = Math.round(1000 / this.scene.game.loop.delta);
     const memory = (performance && performance.memory && performance.memory.usedJSHeapSize) 
         ? (performance.memory.usedJSHeapSize / 1048576).toFixed(2) + ' MB' 
@@ -102,6 +104,7 @@ export default class DebugSystem {
             this.debugTexts.push(this.scene.add.text(10, 115, `Move Time: ${this.scene.moveTime}`, { fontSize: '12px', fill: '#FFF' }));
             if (this.scene.food) {
                 this.debugTexts.push(this.scene.add.text(10, 130, `Food Position: (${this.scene.food.x}, ${this.scene.food.y})`, { fontSize: '12px', fill: '#FFF' }));
+                this.debugTexts.push(this.scene.add.text(10, 160, `Food Eaten: ${this.scene.foodEaten}`, { fontSize: '12px', fill: '#FFF' }));
             }
             // Display the current state of the state machine
             this.debugTexts.push(this.scene.add.text(10, 145, `Current State: ${this.scene.gameStates.currentState}`, { fontSize: '12px', fill: '#FFF' }));
@@ -163,5 +166,44 @@ export default class DebugSystem {
 
     this.debugTexts.push(rect);
     }
+
+    visualizeGrid() {
+        // Clear existing grid if any
+        if (this.gridLines.length) {
+            this.gridLines.forEach(line => line.destroy());
+            this.gridLines = [];
+        }
+
+        const gridSize = 16;
+        const gameWidth = this.gameWidth;
+        const gameHeight = this.gameHeight;
+
+        for (let x = 0; x <= gameWidth; x += gridSize) {
+            const line = this.scene.add.line(0, 0, x, 0, x, gameHeight, 0x00FF00).setOrigin(0, 0);
+            this.gridLines.push(line);
+        }
+
+        for (let y = 0; y <= gameHeight; y += gridSize) {
+            const line = this.scene.add.line(0, 0, 0, y, gameWidth, y, 0x00FF00).setOrigin(0, 0);
+            this.gridLines.push(line);
+        }
+    }
+
+    toggleGrid() {
+        if (this.gridLines.length) {
+            this.gridLines.forEach(line => line.destroy());
+            this.gridLines = [];
+        } else {
+            this.visualizeGrid();
+        }
+    }
+
+clearGrid() {
+    this.debugTexts.forEach(item => {
+        if (item.type === "Line") {
+            item.destroy();
+        }
+    });
+}
 
 }

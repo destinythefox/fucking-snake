@@ -6,9 +6,9 @@ const config = {
     parent: 'game-container',
     width: 640,
     height: 480,
-    version: 0.15,
+    version: 0.25,
     backgroundColor: "#1b1b1b",
-    scene: [StartMenuScene, GameScene]
+    scene: [StartMenuScene, GameScene],
 };
 export default config;
 
