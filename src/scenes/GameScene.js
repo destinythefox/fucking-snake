@@ -136,6 +136,9 @@ export class GameScene extends Phaser.Scene {
     }
 
     createPortals(){
+        if(this.portal1) this.portal1.body.destroy();
+        if(this.portal2) this.portal2.body.destroy();
+
         this.portal1 = new Portal(this, 0xFFA500);
         this.portal2 = new Portal(this, 0x0000FF);
 
